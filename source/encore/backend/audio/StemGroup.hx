@@ -1,5 +1,6 @@
 package encore.backend.audio;
 
+import encore.backend.AssetPaths.Paths;
 import flixel.FlxG;
 import flixel.sound.FlxSound;
 
@@ -64,8 +65,10 @@ class StemGroup
 		{
 			var filePath = folderPath + stem;
 
+			// trace('Attempting to load ' + filePath);
+
 			var sound:FlxSound = new FlxSound();
-			sound.loadEmbedded(filePath);
+			sound.loadEmbedded(Paths.getSound(filePath));
 			FlxG.sound.list.add(sound);
 			soundList.push(sound);
 		}
@@ -75,6 +78,8 @@ class StemGroup
 	{
 		for (sound in soundList)
 		{
+			trace('playing a sound');
+
 			sound.play();
 		}
 	}

@@ -1,5 +1,8 @@
 package encore.states;
 
+import encore.backend.audio.StemGroup.StemPaths;
+import encore.backend.audio.StemGroup;
+import encore.backend.songs.SongHandler;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
@@ -24,6 +27,8 @@ class HomeMenuState extends GameState
 	override public function create()
 	{
 		super.create();
+
+		SongHandler.instance = new SongHandler();
 
 		backgroundTop = new FlxSprite(0, 0).makeGraphic(FlxG.width, 155, 0xFF12121d);
 		add(backgroundTop);
@@ -56,6 +61,15 @@ class HomeMenuState extends GameState
 		quitText.font = 'assets/fonts/RedHatDisplay-Black.ttf';
 		add(quitText);
 		#end
+		// Start playing menu music
+		var sampleSong:SongRegistry = SongHandler.instance.getAny();
+		var stemPaths:StemPaths = new StemPaths(sampleSong.data.stems);
+		trace('Playing ' + sampleSong.path);
+		var stems:StemGroup = new StemGroup(sampleSong.path, stemPaths);
+		SongHandler.instance.currentPlayingStems = stems;
+
+		stems.loadAll();
+		stems.playAll();
 	}
 
 	override public function update(elapsed:Float)
@@ -67,6 +81,7 @@ class HomeMenuState extends GameState
 			if (FlxG.mouse.justPressed)
 			{
 				trace('SOON');
+				FlxG.switchState(new PlayState());
 			}
 		}
 		else

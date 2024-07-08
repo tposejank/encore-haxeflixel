@@ -29,10 +29,19 @@
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
+	<define name="SONGS_ALLOWED" if="desktop" />  <!-- May change depending if android builds get song folder support (idk) -->
+
 	<set name="BUILD_DIR" value="export" />
 	<source path="source" />
 	<assets path="assets" />
-	<assets path="Songs"/>
+	
+	<section if="SONGS_ALLOWED">
+		<assets path="Songs" embed="false"/>
+	</section>
+
+	<section unless="SONGS_ALLOWED">
+		<assets path="Songs" embed="true"/>
+	</section>
 
 	<!-- _______________________________ Libraries ______________________________ -->
 

@@ -20,18 +20,19 @@ class PlayState extends GameState
 	{
 		MidiHandler.instance = new MidiHandler();
 
-		var midiFile:MidiFile = MidiHandler.instance.midiFile('assets/data/24kmagic/notes.mid');
+		var midiFile:MidiFile = MidiHandler.instance.midiFile('Songs/24kmagic/notes.mid');
 		song = MidiHandler.instance.createSong(midiFile);
 		song.validateTimes();
 
-		var infoJsonPath:String = 'assets/data/24kmagic/info.json';
+		var infoJsonPath:String = 'Songs/24kmagic/info.json';
 
 		var parser = new json2object.JsonParser<InfoJson>();
 		parser.fromJson(Paths.getText(infoJsonPath));
 		var data:InfoJson = parser.value;
 
 		var stemPaths:StemPaths = new StemPaths(data.stems);
-		var stems:StemGroup = new StemGroup('assets/data/24kmagic/', stemPaths);
+		trace('Playing');
+		var stems:StemGroup = new StemGroup('Songs/24kmagic/', stemPaths);
 
 		stems.loadAll();
 		stems.playAll();
