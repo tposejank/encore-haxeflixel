@@ -2,12 +2,10 @@ package encore.backend.shaders;
 
 import flixel.system.FlxAssets.FlxShader;
 
-class MenuWavy extends FlxShader
+class MenuBlur extends FlxShader
 {
     // I DO NOT KNOW WHAT I AM DOING!!!
 	@:glFragmentSource('
-// Automatically converted with https://github.com/TheLeerName/ShadertoyToFlixel
-
 #pragma header
 
 #define iResolution vec3(openfl_TextureSize, 0.)
@@ -46,10 +44,12 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
     float Pi = 6.28318530718; // Pi*2
     
+
+	// nerfed af because it thugs the shit out of your gpu
     // GAUSSIAN BLUR SETTINGS {{{
-    float Directions = 180.0; // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
-    float Quality = 3.0; // BLUR QUALITY (Default 4.0 - More is better but slower)
-    float Size = 16.0; // BLUR SIZE (Radius)
+    float Directions = 30.0;
+    float Quality = 2.0;
+    float Size = 10.0;
     // GAUSSIAN BLUR SETTINGS }}}
    
     vec2 Radius = Size/iResolution.xy;

@@ -1,12 +1,18 @@
 package encore.backend;
 
-import flixel.FlxG.FlxRenderMethod;
 import flixel.FlxG;
 import flixel.util.FlxSignal.FlxTypedSignal;
+import haxe.CallStack;
+import lime.app.Application;
 import openfl.Lib;
 import openfl.events.UncaughtErrorEvent;
 
 using StringTools;
+#if sys
+import sys.FileSystem;
+import sys.io.File;
+#end
+
 
 /**
  * A custom crash handler that writes to a log file and displays a message box.
@@ -15,19 +21,6 @@ using StringTools;
 class CrashHandler
 {
 	public static final LOG_FOLDER = 'logs';
-
-	/**
-	 * Called before exiting the game when a standard error occurs, like a thrown exception.
-	 * @param message The error message.
-	 */
-	public static var errorSignal(default, null):FlxTypedSignal<String->Void> = new FlxTypedSignal<String->Void>();
-
-	/**
-	 * Called before exiting the game when a critical error occurs, like a stack overflow or null object reference.
-	 * CAREFUL: The game may be in an unstable state when this is called.
-	 * @param message The error message.
-	 */
-	public static var criticalErrorSignal(default, null):FlxTypedSignal<String->Void> = new FlxTypedSignal<String->Void>();
 
 	/**
 	 * Initializes
@@ -43,70 +36,6 @@ class CrashHandler
 		#end
 	}
 
-	/**
-	 * Called when an uncaught error occurs.
-	 * This handles most thrown errors, and is sufficient to handle everything alone on HTML5.
-	 * @param error Information on the error that was thrown.
-	 */
-	static function onUncaughtError(error:UncaughtErrorEvent):Void
-	{
-		try
-		{
-			errorSignal.dispatch(generateErrorMessage(error));
-
-			#if sys
-			logError(error);
-			#end
-
-			displayError(error);
-		}
-		catch (e:Dynamic)
-		{
-			trace('Error while handling crash: ' + e);
-		}
-	}
-
-	static function onCriticalError(message:String):Void
-	{
-		try
-		{
-			criticalErrorSignal.dispatch(message);
-
-			#if sys
-			logErrorMessage(message, true);
-			#end
-
-			displayErrorMessage(message);
-		}
-		catch (e:Dynamic)
-		{
-			trace('Error while handling crash: $e');
-
-			trace('Message: $message');
-		}
-
-		#if sys
-		// Exit the game. Since it threw an error, we use a non-zero exit code.
-		Sys.exit(1);
-		#end
-	}
-
-	static function displayError(error:UncaughtErrorEvent):Void
-	{
-		displayErrorMessage(generateErrorMessage(error));
-	}
-
-	static function displayErrorMessage(message:String):Void
-	{
-		lime.app.Application.current.window.alert(message, "Fatal Uncaught Exception");
-	}
-
-	#if sys
-	static function logError(error:UncaughtErrorEvent):Void
-	{
-		logErrorMessage(generateErrorMessage(error));
-	}
-
 	static function generateTimestamp(?date:Date = null):String
 	{
 		if (date == null)
@@ -116,123 +45,73 @@ class CrashHandler
 			'${date.getFullYear()}-${Std.string(date.getMonth() + 1).lpad('0', 2)}-${Std.string(date.getDate()).lpad('0', 2)}-${Std.string(date.getHours()).lpad('0', 2)}-${Std.string(date.getMinutes()).lpad('0', 2)}-${Std.string(date.getSeconds()).lpad('0', 2)}';
 	}
 
-	static function logErrorMessage(message:String, critical:Bool = false):Void
+	/**
+	 * Called when an uncaught error occurs.
+	 * This handles most thrown errors, and is sufficient to handle everything alone on HTML5.
+	 * @param error Information on the error that was thrown.
+	 */
+	static function onUncaughtError(e:UncaughtErrorEvent):Void
 	{
+		var errMsg:String = "";
+		var path:String;
+		var callStack:Array<StackItem> = CallStack.exceptionStack(true);
+		var dateNow:String = Date.now().toString();
+		
+		dateNow = dateNow.replace(" ", "_");
+		dateNow = dateNow.replace(":", "'");
+
+		path = "./crash/" + "Encore_" + dateNow + ".txt";
+
+		var platform:String = 'unknown';
 		#if sys
-		if (!sys.FileSystem.exists(LOG_FOLDER))
-		{
-			sys.FileSystem.createDirectory(LOG_FOLDER);
-		}
+		platform = Sys.systemName();
 		#end
-
-		sys.io.File.saveContent('$LOG_FOLDER/crash${critical ? '-critical' : ''}-${generateTimestamp()}.log', buildCrashReport(message));
-	}
-
-	static function buildCrashReport(message:String):String
-	{
-		var fullContents:String = '\n';
-		fullContents += '\n';
-		fullContents += 'System timestamp: ${generateTimestamp()}\n';
-		var driverInfo = FlxG?.stage?.context3D?.driverInfo ?? 'N/A';
-		fullContents += 'Driver info: ${driverInfo}\n';
-		fullContents += 'Platform: ${Sys.systemName()}\n';
-		fullContents += 'Render method: ${renderMethod()}\n';
-
-		var currentState = FlxG.state != null ? Type.getClassName(Type.getClass(FlxG.state)) : 'No state loaded';
-
-		fullContents += 'State: ${currentState}\n';
-		fullContents += message;
-
-		return fullContents;
-	}
-	#end
-
-	static function generateErrorMessage(error:UncaughtErrorEvent):String
-	{
-		var errorMessage:String = "";
-		var callStack:Array<haxe.CallStack.StackItem> = haxe.CallStack.exceptionStack(true);
-
-		errorMessage += '${error.error}\n';
 
 		for (stackItem in callStack)
 		{
 			switch (stackItem)
 			{
 				case FilePos(innerStackItem, file, line, column):
-					errorMessage += '  in ${file}#${line}';
+					errMsg += '  in ${file}#${line}';
 					if (column != null)
-						errorMessage += ':${column}';
+						errMsg += ':${column}';
 				case CFunction:
-					errorMessage += '[Function] ';
+					errMsg += '[Function] ';
 				case Module(m):
-					errorMessage += '[Module(${m})] ';
+					errMsg += '[Module(${m})] ';
 				case Method(classname, method):
-					errorMessage += '[Function(${classname}.${method})] ';
+					errMsg += '[Function(${classname}.${method})] ';
 				case LocalFunction(v):
-					errorMessage += '[LocalFunction(${v})] ';
-			}
-			errorMessage += '\n';
-		}
-
-		return errorMessage;
-	}
-
-	public static function queryStatus():Void
-	{
-		@:privateAccess
-		var currentStatus = Lib.current.stage.__uncaughtErrorEvents.__enabled;
-		trace('ERROR HANDLER STATUS: ' + currentStatus);
-
-		#if openfl_enable_handle_error
-		trace('Define: openfl_enable_handle_error is enabled');
-		#else
-		trace('Define: openfl_enable_handle_error is disabled');
-		#end
-
-		#if openfl_disable_handle_error
-		trace('Define: openfl_disable_handle_error is enabled');
-		#else
-		trace('Define: openfl_disable_handle_error is disabled');
-		#end
-	}
-
-	public static function induceBasicCrash():Void
-	{
-		throw "This is an example of an uncaught exception.";
-	}
-
-	public static function induceNullObjectReference():Void
-	{
-		var obj:Dynamic = null;
-		var value = obj.test;
-	}
-
-	public static function induceNullObjectReference2():Void
-	{
-		var obj:Dynamic = null;
-		var value = obj.test();
-	}
-
-	public static function induceNullObjectReference3():Void
-	{
-		var obj:Dynamic = null;
-		var value = obj();
-	}
-
-	static function renderMethod():String
-	{
-		try
-		{
-			return switch (FlxG.renderMethod)
-			{
-				case FlxRenderMethod.DRAW_TILES: 'DRAW_TILES';
-				case FlxRenderMethod.BLITTING: 'BLITTING';
-				default: 'UNKNOWN';
+					errMsg += '[LocalFunction(${v})] ';
+				default:
+					Sys.println(stackItem);
 			}
 		}
-		catch (e)
-		{
-			return 'ERROR ON QUERY RENDER METHOD: ${e}';
-		}
+		errMsg += "\nUncaught Error: \nState: "
+			+ (FlxG.state != null ? Type.getClassName(Type.getClass(FlxG.state)) : 'Unknown')
+			+ '\n${errMsg}
+		Time: ${generateTimestamp()}
+		Driver: ${FlxG?.stage?.context3D?.driverInfo ?? 'N/A'}
+		System: ${platform}
+		';
+
+		#if sys
+		if (!FileSystem.exists("./crash/"))
+			FileSystem.createDirectory("./crash/");
+
+		File.saveContent(path, errMsg + "\n");
+
+		Sys.println(errMsg);
+		Sys.exit(1);
+		#end
+
+		Application.current.window.alert(errMsg, "Error Caught");
+	}
+
+	static function onCriticalError(message:String):Void
+	{
+		var errMsg:String = "\nCritical Error: " + message;
+		// no point in handling these im not smart
+		Application.current.window.alert(errMsg, "Fatal Critical Error");
 	}
 }

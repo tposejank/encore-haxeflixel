@@ -39,5 +39,6 @@ class Main extends Sprite
 
 		addChild(fpsCounter);
 		FlxG.autoPause = false; // STOP PAUSING ON ME
+		FlxG.mouse.useSystemCursor = true;
 	}
 }

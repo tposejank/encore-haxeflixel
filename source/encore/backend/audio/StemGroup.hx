@@ -41,6 +41,8 @@ class StemGroup extends FlxTypedGroup<FlxSound>
 	public var pitch(get, set):Float;
 	public var volume(get, set):Float;
 	public var playing(get, never):Bool;
+	public var duration(get, never):Float;
+	public var paused(default, set):Bool;
 
 	/**
 	 * Construct a new group of stems.
@@ -62,6 +64,22 @@ class StemGroup extends FlxTypedGroup<FlxSound>
 		else
 		{
 			return false;
+		}
+	}
+
+	/**
+	 * Warning! this will only return the first audio found's duration
+	 * @return Float (not averaged out)
+	 */
+	function get_duration():Float
+	{
+		if (getFirstAlive() != null)
+		{
+			return getFirstAlive().length;
+		}
+		else
+		{
+			return 0;
 		}
 	}
 
@@ -103,12 +121,24 @@ class StemGroup extends FlxTypedGroup<FlxSound>
 	function set_pitch(val:Float):Float
 	{
 		#if FLX_PITCH
-		trace('Setting audio pitch to ' + val);
 		forEachAlive(function(snd:FlxSound)
 		{
 			snd.pitch = val;
 		});
 		#end
+		return val;
+	}
+
+	function set_paused(val:Bool):Bool
+	{
+		forEachAlive(function(snd:FlxSound)
+		{
+			if (val)
+				snd.pause();
+			else
+				snd.play();
+		});
+
 		return val;
 	}
 
