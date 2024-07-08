@@ -84,11 +84,10 @@ class CrashHandler
 				case LocalFunction(v):
 					errMsg += '[LocalFunction(${v})] ';
 				default:
-					Sys.println(stackItem);
+					#if sys Sys.println(stackItem); #end
 			}
 		}
 		errMsg += "\nUncaught Error: \nState: "
-			+ (FlxG.state != null ? Type.getClassName(Type.getClass(FlxG.state)) : 'Unknown')
 			+ '\n${errMsg}
 		Time: ${generateTimestamp()}
 		Driver: ${FlxG?.stage?.context3D?.driverInfo ?? 'N/A'}
