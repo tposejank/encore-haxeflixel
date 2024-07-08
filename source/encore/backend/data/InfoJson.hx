@@ -60,10 +60,14 @@ class InfoJson
 	@:default('notes.mid')
 	public var midi:String;
 
+	// no saving you here! you missed, you screwed!
+	public var art:String;
+
 	public var stems:Stems;
+	// TODO: Difficulties!!
 }
 
-// all stems must be an array because were going through all of them (iykyk)
+// all stems must be an array because we support more than 5 audios
 class Stems
 {
 	@:jcustomparse(encore.backend.data.InfoJson.Stems.forceArrayString)

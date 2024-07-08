@@ -43,6 +43,10 @@
 		<assets path="Songs" embed="true"/>
 	</section>
 
+	<set name="BUILD_DIR" value="export/debug" if="debug" />
+	<set name="BUILD_DIR" value="export/test" unless="debug" />
+	<set name="BUILD_DIR" value="export/release" if="encorerelease" />
+
 	<!-- _______________________________ Libraries ______________________________ -->
 
 	<haxelib name="flixel" />

@@ -6,6 +6,7 @@ import encore.backend.macros.git.Git;
 import encore.backend.macros.release.Release;
 import encore.states.HomeMenuState;
 import encore.states.PlayState;
+import flixel.FlxG;
 import flixel.FlxGame;
 import openfl.display.Sprite;
 
@@ -37,5 +38,6 @@ class Main extends Sprite
 		fpsCounter = new FPS(10, 3, 0xFFFFFF);
 
 		addChild(fpsCounter);
+		FlxG.autoPause = false; // STOP PAUSING ON ME
 	}
 }

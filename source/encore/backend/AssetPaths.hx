@@ -1,6 +1,8 @@
 package encore.backend;
 
+import lime.graphics.Image;
 import openfl.Assets;
+import openfl.display.BitmapData;
 import openfl.media.Sound;
 #if sys
 import sys.FileSystem;
@@ -51,4 +53,13 @@ class Paths {
 		return Assets.getSound(path);
         #end
     }
+	public static function getImage(path:String)
+	{
+		// trace('Something wants to get a sound: ' + path);
+		#if sys
+		return BitmapData.fromFile(path);
+		#else
+		return Assets.getBitmapData(path);
+		#end
+	}
 }
