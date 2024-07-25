@@ -40,6 +40,7 @@ jobs:
         run: echo "${{github.run_id}}" > VERSION
       - name: Compile
         run: |
+          haxelib list
           haxelib run lime build linux
       - name: Publish Artifact
         uses: actions/upload-artifact@main
@@ -67,7 +68,9 @@ jobs:
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
       - name: Compile
-        run: haxelib run lime build windows
+        run: | 
+          haxelib list
+          haxelib run lime build windows
       - name: Publish Artifact
         uses: actions/upload-artifact@main
         with:
@@ -93,7 +96,9 @@ jobs:
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
       - name: Compile
-        run: haxelib run lime build mac
+        run: | 
+          haxelib list
+          haxelib run lime build mac
       - name: Publish Artifact
         uses: actions/upload-artifact@main
         with:
