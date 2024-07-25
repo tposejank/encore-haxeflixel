@@ -161,52 +161,9 @@ jobs:
       - name: Compile
         run: haxelib run lime build android -encorerelease
 
-      - name: Test Directory Contents
-        run: |
-          ls export/test/android/bin/app/build/outputs/apk
-          ls export/test/android/bin/app/build/outputs/apk/release
-          ls export/test/android/bin/app/build/outputs/apk/test
-
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
           name: Encore-Hx-Android
-          path: export/test/android/bin/app/build/outputs/apk/test/*.apk
-          if-no-files-found: error
-
-  buildIOS:
-    runs-on: macos-14
-    steps:
-      - name: Checkout
-        uses: actions/checkout@main
-
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
-        with:
-          haxe-version: 4.3.4
-
-      - name: Install HXCPP
-        run: |
-          haxelib git hxcpp https://github.com/mcagabe19-stuff/hxcpp 8dd30d69399f616f4e85295ce3f828219b78af17 --quiet
-      
-      - name: Install Libraries
-        run: |
-          chmod +x ./setup/unix.sh
-          sh ./setup/unix.sh
-
-      - name: Compile
-        run: haxelib run lime build ios -nosign
-
-      - name: Make IPA
-        run: |
-          cd export/release/ios/build/*-iphoneos
-          mkdir Payload
-          mv *.app Payload
-          zip -r Encore.ipa Payload
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@main
-        with:
-          name: iOSBuild
-          path: export/test/ios/build/Release-iphoneos/*.ipa
+          path: export/test/android/bin/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
