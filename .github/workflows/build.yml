@@ -36,6 +36,9 @@ jobs:
           haxelib install hxcpp
           haxelib install hxpkg
           haxelib run hxpkg install
+          .haxelib/hxcpp/4,3,2/
+          cd tools/hxcpp
+          haxe compile.hxml
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
       - name: Compile
