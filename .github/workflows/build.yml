@@ -168,7 +168,7 @@ jobs:
           path: export/test/android/bin/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
 
-  iOS:
+  buildIOS:
     runs-on: macos-14
     steps:
       - name: Checkout
