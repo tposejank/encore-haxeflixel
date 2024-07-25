@@ -167,3 +167,45 @@ jobs:
           name: Encore-Hx-Android
           path: export/test/android/bin/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+  iOS:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.4
+
+      - name: Install HXCPP
+        run: |
+          haxelib git hxcpp https://github.com/mcagabe19-stuff/hxcpp 8dd30d69399f616f4e85295ce3f828219b78af17 --quiet
+      
+      - name: Install Libraries
+        run: |
+          chmod +x ./setup/unix.sh
+          sh ./setup/unix.sh
+
+      - name: Compile
+        run: haxelib run lime build ios -nosign -encorerelease -final
+
+      - name: Make IPA
+        run: |
+          cd export/release/ios/build/*-iphoneos
+          mkdir Payload
+          mv *.app Payload
+          zip -r Encore.ipa Payload
+
+      - name: Make Archive
+        run: |
+           cd export/release/ios/build/*-iphoneos
+           zip Encore-Hx-iOS.zip Encore.ipa
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: iOSBuild
+          path: export/test/ios/build/Release-iphoneos/*.zip
+          if-no-files-found: error
