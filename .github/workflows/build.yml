@@ -21,22 +21,23 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout
-        uses: actions/checkout@v2.3.0
+      - uses: actions/checkout@v2.3.0
 
-      - name: Install Haxe
-        uses: krdlab/setup-haxe@master
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.4
       # Runs a set of commands using the runners shell
       - name: Install HXCPP
         run: |
           haxelib install hxcpp
+        shell: cmd
+
       - name: Install HXPKG
         run: |
           haxelib install hxpkg
-          haxelib run hxpkg install
+          haxelib run hxpkg
         shell: cmd
+
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
       - name: Compile
@@ -44,5 +45,5 @@ jobs:
       - name: Publish Artifact
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: windowsBuild
+          name: Encore-Hx-Win64
           path: export/test/windows/bin
