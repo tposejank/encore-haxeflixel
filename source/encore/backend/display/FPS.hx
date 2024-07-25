@@ -78,7 +78,7 @@ class FPS extends TextField
 			#if encorerelease
             text = 'v'+Main.RELEASE + '-' + Main.GIT_HASH + "\nFPS: " + currentFPS;
             #else
-            text = 'v'+Main.RELEASE + '-' + Main.GIT_HASH + ' ' + Main.GIT_BRANCH + Main.GIT_LOCAL_CHANGES + "\nFPS: " + currentFPS;
+			text = 'v' + Main.RELEASE + '-' + Main.GIT_HASH + ' ' + Main.GIT_BRANCH + "\nFPS: " + currentFPS;
             #end
 
 			#if (gl_stats && !disable_cffi && (!html5 || !canvas))
