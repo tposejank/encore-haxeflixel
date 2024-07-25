@@ -33,15 +33,14 @@ jobs:
       - name: Install Haxelib
         run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp > /dev/null
+          haxelib install hxcpp
           haxelib install hxpkg
           haxelib run hxpkg install
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
       - name: Compile
         run: |
-          haxelib fixrepo
-          haxelib run lime build Project.xml linux
+          haxelib run lime build linux
       - name: Publish Artifact
         uses: actions/upload-artifact@main
         with:
@@ -61,7 +60,7 @@ jobs:
       - name: Install Haxelib
         run: |
           haxelib setup C:/haxelib
-          haxelib install hxcpp > /dev/null
+          haxelib install hxcpp
           haxelib install hxpkg
           haxelib run hxpkg install
         shell: cmd
@@ -88,7 +87,7 @@ jobs:
       - name: Install Haxelib
         run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp > /dev/null
+          haxelib install hxcpp
           haxelib install hxpkg
           haxelib run hxpkg install
       - name: Create Version Tag
