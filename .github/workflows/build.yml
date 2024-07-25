@@ -161,11 +161,17 @@ jobs:
       - name: Compile
         run: haxelib run lime build android -encorerelease
 
+      - name: Test Directory Contents
+        run: |
+          ls export/test/android/bin/app/build/outputs/apk
+          ls export/test/android/bin/app/build/outputs/apk/release
+          ls export/test/android/bin/app/build/outputs/apk/test
+
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
           name: Encore-Hx-Android
-          path: export/test/android/bin/app/build/outputs/apk/release/*.apk
+          path: export/test/android/bin/app/build/outputs/apk/test/*.apk
           if-no-files-found: error
 
   buildIOS:
@@ -189,7 +195,7 @@ jobs:
           sh ./setup/unix.sh
 
       - name: Compile
-        run: haxelib run lime build ios -nosign -encorerelease -final
+        run: haxelib run lime build ios -nosign
 
       - name: Make IPA
         run: |
@@ -198,14 +204,9 @@ jobs:
           mv *.app Payload
           zip -r Encore.ipa Payload
 
-      - name: Make Archive
-        run: |
-           cd export/release/ios/build/*-iphoneos
-           zip Encore-Hx-iOS.zip Encore.ipa
-
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
           name: iOSBuild
-          path: export/test/ios/build/Release-iphoneos/*.zip
+          path: export/test/ios/build/Release-iphoneos/*.ipa
           if-no-files-found: error
