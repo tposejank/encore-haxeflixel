@@ -64,8 +64,13 @@ jobs:
         run: |
           haxelib setup C:/haxelib
           haxelib --global install hxcpp
-          ls
-          haxe .haxelib/hxcpp/4,3,2/tools/hxcpp/compile.hxml
+          cd C:/
+          cd haxelib
+          cd hxcpp
+          cd 4,3,2
+          cd tools
+          cd hxcpp
+          haxe compile.hxml
           haxelib install hxpkg
           haxelib run hxpkg install
         shell: cmd
