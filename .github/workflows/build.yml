@@ -35,7 +35,7 @@ jobs:
       - name: Install HXPKG
         run: |
           haxelib install hxpkg
-          haxelib run hxpkg
+          haxelib run hxpkg install
         shell: cmd
 
       - name: Create Version Tag
