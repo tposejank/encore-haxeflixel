@@ -37,12 +37,6 @@ class PlayState extends GameState
 		stems.loadAll();
 		stems.playAll();
 
-		//trace(stems.paths.DRUMS);
-		// fullSound = new FlxSound();
-		// fullSound.loadEmbedded('assets/data/24kmagic/full.ogg');
-		// fullSound.play();
-		// FlxG.sound.list.add(fullSound);
-
 		super.create();
 	}
 
@@ -66,7 +60,5 @@ class PlayState extends GameState
 		// }
 
 		super.update(elapsed);
-
-		//trace('Song time ${fullSound.time}');
 	}
 }
